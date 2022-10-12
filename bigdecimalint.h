@@ -27,6 +27,9 @@ public:
     int sign();
     
     friend ostream& operator << (ostream&, BigDecimalInt ); 
+     friend bool checkvalid(BigDecimalInt &b);
+    friend bool checksign(BigDecimalInt &b);
+    friend bool checkbigger(string a, string b);
 
 };
 
