@@ -1,7 +1,6 @@
 #ifndef BIGDECIMALINT_H
 #define BIGDECIMALINT_H
-#include <iostream>
-#include <string>
+#include <bits/stdc++.h>
 using namespace std;
 
 class BigDecimalInt
