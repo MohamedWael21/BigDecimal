@@ -10,6 +10,7 @@ public:
 
     BigDecimalInt(string );
     BigDecimalInt(int );
+    BigDecimalInt();
     
 
     BigDecimalInt operator+(BigDecimalInt);
