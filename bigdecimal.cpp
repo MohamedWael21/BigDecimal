@@ -62,6 +62,23 @@ else if (decint >0 ){
     reverseStr(num);
 
 }
+BigDecimalInt BigDecimalInt::operator+(BigDecimalInt b)
+{
+
+   if (  num[0]=='-'   &&  (b.num[0]=='+'||(b.num[0]<='9'&&b.num[0]>='0'))  )
+
+
+    {
+        checksign(*this);
+        return b - *this;
+    }
+
+    if ((num[0]=='+'||(num[0]<='9'&&num[0]>='0'))       &&      b.num[0]=='-')
+    {
+        checksign(b);
+        return *this - b;
+    }
+
 
 
 
