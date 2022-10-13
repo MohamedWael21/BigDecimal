@@ -62,6 +62,42 @@ else if (decint >0 ){
     reverseStr(num);
 
 }
+
+
+//function to check sign of class
+bool checksign(BigDecimalInt &b)
+{
+    string c="";
+    if (b.num[0]=='-')
+    {
+        for (int i=1; i<b.num.length(); i++)
+        {
+            c+=b.num[i];
+        }
+        b.num=c;
+        return 1;
+    }
+
+    else if(b.num[0]=='+')
+    {
+
+        for (int i=1; i<b.num.length(); i++)
+        {
+            c+=b.num[i];
+        }
+        b.num=c;
+        return 0;
+
+    }
+    else
+    {
+        return 0;
+    }
+
+
+}
+
+
 BigDecimalInt BigDecimalInt::operator+(BigDecimalInt b)
 {
 
