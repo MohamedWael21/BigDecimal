@@ -80,5 +80,153 @@ BigDecimalInt BigDecimalInt::operator+(BigDecimalInt b)
     }
 
 
+    if (b.num.length()>num.length())
+    {
+
+        bool checker = (checksign(b)&&checksign(*this)); /// if both - add - at the end
+
+        int diff=b.num.length()-num.length();
+
+        BigDecimalInt c;
+        c.num="";
+        c.carry=0;
+
+        for (int i=(num.length()-1); i>=0; i--)
+        {
+
+            c.sum=0;
+            c.sum=num[i]+b.num[i+diff]-2*'0'+c.carry;
+            c.carry=0;
+            if (c.sum>9)
+            {
+                c.sum-=10;
+                c.carry++;
+            }
+            c.num+=c.sum+'0';
+
+        }
+        for (int i=diff-1; i>=0; i--)
+        {
+            c.sum=0;
+            c.sum+=b.num[i]+c.carry-'0';
+            c.carry=0;
+            if (c.sum>9)
+            {
+                c.sum-=10;
+                c.carry++;
+
+            }
+
+            c.num+=c.sum+'0';
+        }
+        if (c.carry>0)
+        {
+            c.num+=c.carry+'0';
+        }
+
+        if (checker)
+        {
+            c.num+='-';
+        }
+        reverseStr(c.num) ;
+        return c;
+
+    }
+
+
+    else if (num.length()>b.num.length())
+    {
+
+        bool checker=checksign(b)&&checksign(*this);
+        int diff=num.length()-b.num.length();
+        BigDecimalInt c;
+        c.num="";
+        c.carry=0;
+
+        for (int i=(b.num.length()-1); i>=0; i--)
+        {
+            c.sum=0;
+            c.sum=num[i+diff]+b.num[i]-2*'0'+c.carry;
+            c.carry=0;
+            if (c.sum>9)
+            {
+                c.sum-=10;
+                c.carry++;
+            }
+            c.num+=c.sum+'0';
+
+        }
+        for (int i=diff-1; i>=0; i--)
+        {
+            c.sum=0;
+            c.sum+=num[i]+c.carry-'0';
+            c.carry=0;
+            if (c.sum>9)
+            {
+                c.sum-=10;
+                c.carry++;
+
+            }
+            c.num+=c.sum+'0';
+
+        }
+
+        if (c.carry>0)
+        {
+            c.num+=c.carry+'0';
+        }
+
+        if (checker)
+        {
+            c.num+='-';
+        }
+        reverseStr(c.num) ;
+        return c;
+    }
+
+
+    else
+    {
+
+        bool checker=checksign(b)&&checksign(*this);
+
+        BigDecimalInt c;
+        c.num="";
+        c.carry=0;
+
+        for (int i=(num.length()-1); i>=0; i--)
+        {
+
+            c.sum=0;
+            c.sum=num[i]+b.num[i]-2*'0'+c.carry;
+            c.carry=0;
+            if (c.sum>9)
+            {
+                c.sum-=10;
+                c.carry++;
+            }
+            c.num+=c.sum+'0';
+
+        }
+
+        if (c.carry>0)
+        {
+            c.num+=c.carry+'0';
+        }
+
+        if (checker)
+        {
+            c.num+='-';
+        }
+
+
+        reverseStr(c.num) ;
+        return c;
+
+    }
+}
+
+
+
 
 
