@@ -6,14 +6,16 @@ using namespace std;
 class BigDecimalInt
 {
 string num;
+     string num;
+    int sum, carry;
 public:
 
-    BigDecimalInt(string );
-    BigDecimalInt(int );
+    BigDecimalInt(string decstr );
+    BigDecimalInt(int decint );
     BigDecimalInt();
     
 
-    BigDecimalInt operator+(BigDecimalInt);
+    BigDecimalInt operator+(BigDecimalInt b);
     BigDecimalInt operator-(BigDecimalInt);
 
 
