@@ -6,260 +6,174 @@ using namespace std;
 //making a function to reverse string
 void reverseStr(string& str)
 {
-    int n = str.length();
-    for (int i = 0; i < n / 2; i++)
-        swap(str[i], str[n - i - 1]);
+    reverse(str.begin(), str.end());
 }
 //making the constructors of the class
 
 BigDecimalInt::BigDecimalInt()
 {
-    num="";
+    Number = "";
 }
 
 
 BigDecimalInt::BigDecimalInt(string decstr)
 {
-    num=decstr;
+    Number = decstr;
 }
 
 BigDecimalInt :: BigDecimalInt (int decint)
 {
-    if (decint < 0)
-    {
-        decint*=-1;
-
-        while ( decint!=0)
-    {
-
-        num+=(decint%10)+'0';
-        decint-= decint%10;
-        decint/=10;
-
-    }
-    num+='-';
-    }
-
-
-
- else   if (decint == 0)
-    {
-        //cout<<"i'm here\n";
-        num="0";
-    }
-
-
-else if (decint >0 ){
-    while ( decint!=0)
-    {
-
-        num+=(decint%10)+'0';
-        decint-= decint%10;
-        decint/=10;
-
-    }
+    Number = to_string(decint);
 }
-    reverseStr(num);
-
-}
-
 
 //function to check sign of class
-bool checksign(BigDecimalInt &b)
+int CheckSign(string &a, BigDecimalInt &b)
 {
-    string c="";
-    if (b.num[0]=='-')
-    {
-        for (int i=1; i<b.num.length(); i++)
-        {
-            c+=b.num[i];
-        }
-        b.num=c;
+    if((a.front() == '+' || isdigit(a.front())) && (b.Number.front() == '+' || isdigit(b.Number.front()))) // The two numbers are +ve
         return 1;
-    }
-
-    else if(b.num[0]=='+')
-    {
-
-        for (int i=1; i<b.num.length(); i++)
-        {
-            c+=b.num[i];
-        }
-        b.num=c;
-        return 0;
-
-    }
-    else
-    {
-        return 0;
-    }
-
+    if(a.front() == '-' && b.Number.front() == '-') // The two numbers are -ve
+        return -1;
+    return 0;
 
 }
 
+int BigDecimalInt::size(){
+    return Number.size();
+}
+
+int BigDecimalInt::length(){
+
+    for(int i = 0; i < Number.size(); i++)
+        if(isdigit(Number[i]) && Number[i] != '0')
+            return Number.size()-i;
+
+}
+
+BigDecimalInt BigDecimalInt::operator= (BigDecimalInt b){
+    Number = b.Number;
+
+}
+
+bool BigDecimalInt::operator<( BigDecimalInt b){
+
+
+    if(b.Number[0] == '-' && (Number[0] == '+' || isdigit(Number[0])))
+        return false;
+    if((b.Number[0] == '+' || isdigit(b.Number[0])) && Number[0] == '-')
+        return true;
+
+    if((b.Number[0] == '+' || isdigit(b.Number[0])) && (Number[0] == '+' || isdigit(Number[0]))){
+        if((*this).length() > b.length())
+            return false;
+        else if((*this).length() < b.length())
+            return true;
+
+        for(int i = 0; i < b.length(); i++){
+            if(Number[i] > b.Number[i])
+                return false;
+            else if(Number[i] < b.Number[i])
+                return true;
+        }
+    }
+    else{
+
+        if((*this).length() > b.length())
+            return true;
+        else if((*this).length() < b.length())
+            return false;
+
+        for(int i = 0; i < b.length(); i++){
+            if(Number[i] > b.Number[i])
+                return true;
+            else if(Number[i] < b.Number[i])
+                return false;
+        }
+    }
+    return false;
+
+}
+
+BigDecimalInt BigDecimalInt::operator-(BigDecimalInt b){
+
+    BigDecimalInt result;
+    if((*this) < b){
+        result = b - (*this);
+        result.Number = '-' + result.Number;
+        return result;
+    }
+
+    for(int i = 0; i < max(b.Number.size(), Number.size()); i++)
+        result.Number[i] = '0';
+
+    while (b.length() < (*this).length())
+        b.Number = '0' + b.Number;
+    for(int i = 0; i < (*this).length(); i++){
+        result.Number[i] = Number[i] - b.Number[i];
+    }
+
+    for(int i = 0; i < result.length(); i++){
+        while(result.Number[i] < 0){
+            result.Number[i] += 10;
+            result.Number[i+1]--;
+        }
+    }
+
+    return result;
+
+
+}
 
 BigDecimalInt BigDecimalInt::operator+(BigDecimalInt b)
 {
+    int status = CheckSign(Number, b);
+    BigDecimalInt result;
 
-   if (  num[0]=='-'   &&  (b.num[0]=='+'||(b.num[0]<='9'&&b.num[0]>='0'))  )
-
-
-    {
-        checksign(*this);
-        return b - *this;
-    }
-
-    if ((num[0]=='+'||(num[0]<='9'&&num[0]>='0'))       &&      b.num[0]=='-')
-    {
-        checksign(b);
-        return *this - b;
-    }
-
-
-    if (b.num.length()>num.length())
-    {
-
-        bool checker = (checksign(b)&&checksign(*this)); /// if both - add - at the end
-
-        int diff=b.num.length()-num.length();
-
-        BigDecimalInt c;
-        c.num="";
-        c.carry=0;
-
-        for (int i=(num.length()-1); i>=0; i--)
-        {
-
-            c.sum=0;
-            c.sum=num[i]+b.num[i+diff]-2*'0'+c.carry;
-            c.carry=0;
-            if (c.sum>9)
-            {
-                c.sum-=10;
-                c.carry++;
-            }
-            c.num+=c.sum+'0';
-
-        }
-        for (int i=diff-1; i>=0; i--)
-        {
-            c.sum=0;
-            c.sum+=b.num[i]+c.carry-'0';
-            c.carry=0;
-            if (c.sum>9)
-            {
-                c.sum-=10;
-                c.carry++;
-
-            }
-
-            c.num+=c.sum+'0';
-        }
-        if (c.carry>0)
-        {
-            c.num+=c.carry+'0';
+    if(status != 0){ // The two numbers are +ve || -ve
+        if(status == -1){
+            Number.erase(Number.begin());
+            b.Number.erase(Number.begin());
         }
 
-        if (checker)
-        {
-            c.num+='-';
+        while(Number.size() > b.Number.size())
+            b.Number = '0' + b.Number;
+
+        while(b.Number.size() > Number.size())
+            Number = '0' + Number;
+
+        int carry = 0;
+
+        for(int i = Number.size()-1; i > -1; i--){
+            carry = (Number[i] - '0') + (b.Number[i] - '0') + carry;
+            result = char((carry%10) + '0') + result.Number;
+            carry /= 10;
         }
-        reverseStr(c.num) ;
-        return c;
+
+        if(status == -1){
+            Number = '-' + Number;
+            b.Number = '-' + b.Number;
+        }
+
+        if(carry == 1)
+            result.Number = '1' + result.Number;
+
+        if(status == -1)
+            result.Number = '-' + result.Number;
+
+        return result;
 
     }
 
-
-    else if (num.length()>b.num.length())
-    {
-
-        bool checker=checksign(b)&&checksign(*this);
-        int diff=num.length()-b.num.length();
-        BigDecimalInt c;
-        c.num="";
-        c.carry=0;
-
-        for (int i=(b.num.length()-1); i>=0; i--)
-        {
-            c.sum=0;
-            c.sum=num[i+diff]+b.num[i]-2*'0'+c.carry;
-            c.carry=0;
-            if (c.sum>9)
-            {
-                c.sum-=10;
-                c.carry++;
-            }
-            c.num+=c.sum+'0';
-
+    else{
+        if(Number.front() == '-'){
+            result = b - (*this);
+            return result;
         }
-        for (int i=diff-1; i>=0; i--)
-        {
-            c.sum=0;
-            c.sum+=num[i]+c.carry-'0';
-            c.carry=0;
-            if (c.sum>9)
-            {
-                c.sum-=10;
-                c.carry++;
-
-            }
-            c.num+=c.sum+'0';
-
+        else{
+            result = (*this) - b;
+            return result;
         }
-
-        if (c.carry>0)
-        {
-            c.num+=c.carry+'0';
-        }
-
-        if (checker)
-        {
-            c.num+='-';
-        }
-        reverseStr(c.num) ;
-        return c;
     }
 
-
-    else
-    {
-
-        bool checker=checksign(b)&&checksign(*this);
-
-        BigDecimalInt c;
-        c.num="";
-        c.carry=0;
-
-        for (int i=(num.length()-1); i>=0; i--)
-        {
-
-            c.sum=0;
-            c.sum=num[i]+b.num[i]-2*'0'+c.carry;
-            c.carry=0;
-            if (c.sum>9)
-            {
-                c.sum-=10;
-                c.carry++;
-            }
-            c.num+=c.sum+'0';
-
-        }
-
-        if (c.carry>0)
-        {
-            c.num+=c.carry+'0';
-        }
-
-        if (checker)
-        {
-            c.num+='-';
-        }
-
-
-        reverseStr(c.num) ;
-        return c;
-
-    }
 }
 
 
