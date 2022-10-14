@@ -7,6 +7,7 @@ class BigDecimalInt
 {
 private:
     string Number = "";
+    int length();
 public:
 
     BigDecimalInt(string decstr );
@@ -23,11 +24,11 @@ public:
 
     int size(); 
     int sign();
-    int length();
-    friend ostream& operator << (ostream&, BigDecimalInt ); 
-    friend bool checkvalid(BigDecimalInt &b);
-    friend int CheckSign(string &a, BigDecimalInt &b);
-    friend bool checkbigger(string a, string b);
+
+
+
+    friend ostream& operator<<(ostream&, BigDecimalInt); 
+    friend int CheckSign(string&, BigDecimalInt&);
 
 };
 

@@ -3,12 +3,6 @@
 #include <string>
 using namespace std;
 
-//making a function to reverse string
-void reverseStr(string& str)
-{
-    reverse(str.begin(), str.end());
-}
-//making the constructors of the class
 
 BigDecimalInt::BigDecimalInt()
 {
@@ -176,7 +170,21 @@ BigDecimalInt BigDecimalInt::operator+(BigDecimalInt b)
 
 }
 
+bool BigDecimalInt::operator>(BigDecimalInt b){
+    return b < (*this);
+}
 
+bool BigDecimalInt::operator==(BigDecimalInt b){
+    return Number == b.Number;
+}
 
+int BigDecimalInt::sign(){
+    return (!Number.empty() && Number[0] == '-' ? -1 : 1);
+}
 
-
+ostream& operator<<(ostream&out, BigDecimalInt b){
+    for(char digit : b.Number){
+        out << digit;
+    }
+    out << '\n';
+}
