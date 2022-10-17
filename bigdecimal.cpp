@@ -4,187 +4,152 @@
 using namespace std;
 
 
-BigDecimalInt::BigDecimalInt()
-{
-    Number = "";
+BigDecimalInt::BigDecimalInt(){
+    number = "";
+    isNegative = false;
 }
 
 
-BigDecimalInt::BigDecimalInt(string decstr)
-{
-    Number = decstr;
+BigDecimalInt::BigDecimalInt(string decstr){
+    isNegative = (!decstr.empty() && decstr[0] == '-');
+    int start = isNegative ? 1 : 0;
+    number = decstr.substr(start);
 }
 
-BigDecimalInt :: BigDecimalInt (int decint)
-{
-    Number = to_string(decint);
+BigDecimalInt :: BigDecimalInt (int decint){
+    number = to_string(decint);
+    isNegative = (!number.empty() && number[0] == '-');
+    int start = isNegative ? 1 : 0;
+    number = number.substr(start);
 }
 
-//function to check sign of class
-int CheckSign(string &a, BigDecimalInt &b)
-{
-    if((a.front() == '+' || isdigit(a.front())) && (b.Number.front() == '+' || isdigit(b.Number.front()))) // The two numbers are +ve
-        return 1;
-    if(a.front() == '-' && b.Number.front() == '-') // The two numbers are -ve
-        return -1;
-    return 0;
-
-}
 
 int BigDecimalInt::size(){
-    return Number.size();
+    return number.size();
 }
 
-int BigDecimalInt::length(){
 
-    for(int i = 0; i < Number.size(); i++)
-        if(isdigit(Number[i]) && Number[i] != '0')
-            return Number.size()-i;
-
+BigDecimalInt BigDecimalInt::operator= (BigDecimalInt rightOperand){
+    number = rightOperand.number;
+    isNegative = rightOperand.isNegative;
+    return (*this);
 }
 
-BigDecimalInt BigDecimalInt::operator= (BigDecimalInt b){
-    Number = b.Number;
-
-}
-
-bool BigDecimalInt::operator<( BigDecimalInt b){
-
-
-    if(b.Number[0] == '-' && (Number[0] == '+' || isdigit(Number[0])))
-        return false;
-    if((b.Number[0] == '+' || isdigit(b.Number[0])) && Number[0] == '-')
+bool BigDecimalInt::operator<( BigDecimalInt rightOperand){
+    if(isNegative && !rightOperand.isNegative){
         return true;
-
-    if((b.Number[0] == '+' || isdigit(b.Number[0])) && (Number[0] == '+' || isdigit(Number[0]))){
-        if((*this).length() > b.length())
-            return false;
-        else if((*this).length() < b.length())
-            return true;
-
-        for(int i = 0; i < b.length(); i++){
-            if(Number[i] > b.Number[i])
-                return false;
-            else if(Number[i] < b.Number[i])
-                return true;
-        }
     }
-    else{
-
-        if((*this).length() > b.length())
-            return true;
-        else if((*this).length() < b.length())
-            return false;
-
-        for(int i = 0; i < b.length(); i++){
-            if(Number[i] > b.Number[i])
-                return true;
-            else if(Number[i] < b.Number[i])
-                return false;
-        }
+    if(!isNegative && rightOperand.isNegative){
+        return false;
     }
-    return false;
+    bool isLessThan;
+    if(size() == rightOperand.size()){
+        isLessThan = number < rightOperand.number;
+    }else{
+        isLessThan = size() < rightOperand.size();
+    }
 
+    return (isNegative ? !isLessThan : isLessThan);
 }
 
-BigDecimalInt BigDecimalInt::operator-(BigDecimalInt b){
+BigDecimalInt BigDecimalInt::operator-(BigDecimalInt rightOperand){
+    if(rightOperand.isNegative){
+        rightOperand.isNegative = false;
+        return (*this) + rightOperand;
+    }
+    if(isNegative && !rightOperand.isNegative){
+        rightOperand.isNegative = true;
+        return (*this) + rightOperand;
+    }
 
     BigDecimalInt result;
-    if((*this) < b){
-        result = b - (*this);
-        result.Number = '-' + result.Number;
-        return result;
+    result.isNegative = (*this) < rightOperand;
+    if(result.isNegative){
+        return rightOperand - (*this);
     }
-
-    for(int i = 0; i < max(b.Number.size(), Number.size()); i++)
-        result.Number[i] = '0';
-
-    while (b.length() < (*this).length())
-        b.Number = '0' + b.Number;
-    for(int i = 0; i < (*this).length(); i++){
-        result.Number[i] = Number[i] - b.Number[i];
-    }
-
-    for(int i = 0; i < result.length(); i++){
-        while(result.Number[i] < 0){
-            result.Number[i] += 10;
-            result.Number[i+1]--;
+    string up = number;
+    int i = up.size()-1;
+    int j = rightOperand.size();
+    while(i>=0 && j>=0){
+        int currentDigit = up[i] - '0';
+        if(up[i] < rightOperand.number[j]){
+            int k = i-1;
+            while(k>=0 && up[k] == '0'){
+                up[k] = '9';
+                k--;
+            }
+            up[k] = ((up[k] - '0') - 1) + '0';
+            currentDigit += 10;
         }
+        result.number.push_back((currentDigit - (rightOperand.number[j] - '0')) + '0');
     }
-
+    while(i>=0){
+        result.number.push_back(up[i]);
+        i--;
+    }
+    reverse(result.number.begin(), result.number.end());
     return result;
-
-
 }
 
-BigDecimalInt BigDecimalInt::operator+(BigDecimalInt b)
-{
-    int status = CheckSign(Number, b);
+BigDecimalInt BigDecimalInt::operator+(BigDecimalInt rightOperand){
+    if(isNegative && !rightOperand.isNegative){
+        return rightOperand - (*this);
+    }
+    if(!isNegative && rightOperand.isNegative){
+        return (*this) - rightOperand;
+    }
+    int carry = 0;
+    int i = size()-1;
+    int j = rightOperand.size()-1;
+    string sum;
+    while(i >=0 && j>=0){
+        int currentDigitSum = (number[i]-'0') + (rightOperand.number[j]-'0') + carry;
+        sum.push_back((currentDigitSum%10)+'0');
+        carry = currentDigitSum / 10;
+        i--;
+        j--;
+    }
+    while(j>=0){
+        int currentDigitSum = (rightOperand.number[j]-'0') + carry;
+        sum.push_back((currentDigitSum%10)+'0');
+        carry = currentDigitSum / 10;
+        j--;
+    }
+    while(i>=0){
+        int currentDigitSum = (number[i]-'0') + carry;
+        sum.push_back((currentDigitSum%10)+'0');
+        carry = currentDigitSum / 10;
+        i--;
+    }
+    if(carry){
+        sum.push_back(carry + '0');
+    }
+    reverse(sum.begin(), sum.end());
     BigDecimalInt result;
-
-    if(status != 0){ // The two numbers are +ve || -ve
-        if(status == -1){
-            Number.erase(Number.begin());
-            b.Number.erase(Number.begin());
-        }
-
-        while(Number.size() > b.Number.size())
-            b.Number = '0' + b.Number;
-
-        while(b.Number.size() > Number.size())
-            Number = '0' + Number;
-
-        int carry = 0;
-
-        for(int i = Number.size()-1; i > -1; i--){
-            carry = (Number[i] - '0') + (b.Number[i] - '0') + carry;
-            result = char((carry%10) + '0') + result.Number;
-            carry /= 10;
-        }
-
-        if(status == -1){
-            Number = '-' + Number;
-            b.Number = '-' + b.Number;
-        }
-
-        if(carry == 1)
-            result.Number = '1' + result.Number;
-
-        if(status == -1)
-            result.Number = '-' + result.Number;
-
-        return result;
-
-    }
-
-    else{
-        if(Number.front() == '-'){
-            result = b - (*this);
-            return result;
-        }
-        else{
-            result = (*this) - b;
-            return result;
-        }
-    }
-
+    result.number = sum;
+    result.isNegative = (isNegative && rightOperand.isNegative);
+    return result;
 }
 
 bool BigDecimalInt::operator>(BigDecimalInt b){
     return b < (*this);
 }
 
-bool BigDecimalInt::operator==(BigDecimalInt b){
-    return Number == b.Number;
+bool BigDecimalInt::operator==(BigDecimalInt rightOperand){
+    return (number == rightOperand.number && isNegative == rightOperand.isNegative);
 }
 
 int BigDecimalInt::sign(){
-    return (!Number.empty() && Number[0] == '-' ? -1 : 1);
-}
+    return (isNegative ? -1 : 1);
+}    
 
-ostream& operator<<(ostream&out, BigDecimalInt b){
-    for(char digit : b.Number){
+ostream& operator<<(ostream&out, BigDecimalInt rightOperand){
+    if(rightOperand.isNegative){
+        out << '-';
+    }
+    for(char digit : rightOperand.number){
         out << digit;
     }
     out << '\n';
+    return out;
 }

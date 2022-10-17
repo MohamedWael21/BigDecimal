@@ -6,8 +6,8 @@ using namespace std;
 class BigDecimalInt
 {
 private:
-    string Number = "";
-    int length();
+    string number;
+    bool isNegative;
 public:
 
     BigDecimalInt(string decstr );
@@ -28,7 +28,7 @@ public:
 
 
     friend ostream& operator<<(ostream&, BigDecimalInt); 
-    friend int CheckSign(string&, BigDecimalInt&);
+    
 
 };
 
