@@ -65,11 +65,13 @@ BigDecimalInt BigDecimalInt::operator-(BigDecimalInt rightOperand){
     BigDecimalInt result;
     result.isNegative = (*this) < rightOperand;
     if(result.isNegative){
-        return rightOperand - (*this);
+        result = rightOperand - (*this);
+        result.isNegative = true;
+        return result;
     }
     string up = number;
     int i = up.size()-1;
-    int j = rightOperand.size();
+    int j = rightOperand.size()-1;
     while(i>=0 && j>=0){
         int currentDigit = up[i] - '0';
         if(up[i] < rightOperand.number[j]){
@@ -82,9 +84,13 @@ BigDecimalInt BigDecimalInt::operator-(BigDecimalInt rightOperand){
             currentDigit += 10;
         }
         result.number.push_back((currentDigit - (rightOperand.number[j] - '0')) + '0');
+        i--;
+        j--;
     }
     while(i>=0){
-        result.number.push_back(up[i]);
+        if(up[i] != '0'){
+            result.number.push_back(up[i]);
+        }
         i--;
     }
     reverse(result.number.begin(), result.number.end());
@@ -93,9 +99,11 @@ BigDecimalInt BigDecimalInt::operator-(BigDecimalInt rightOperand){
 
 BigDecimalInt BigDecimalInt::operator+(BigDecimalInt rightOperand){
     if(isNegative && !rightOperand.isNegative){
+        isNegative = false;
         return rightOperand - (*this);
     }
     if(!isNegative && rightOperand.isNegative){
+        rightOperand.isNegative = false;
         return (*this) - rightOperand;
     }
     int carry = 0;
@@ -141,7 +149,7 @@ bool BigDecimalInt::operator==(BigDecimalInt rightOperand){
 
 int BigDecimalInt::sign(){
     return (isNegative ? -1 : 1);
-}    
+}
 
 ostream& operator<<(ostream&out, BigDecimalInt rightOperand){
     if(rightOperand.isNegative){
